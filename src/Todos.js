@@ -1,15 +1,27 @@
-import { Container, Box, Typography, Paper } from "@mui/material";
+import {
+  Container,
+  Box,
+  Typography,
+  Paper,
+  TextField,
+  Button
+} from "@mui/material";
 import { useState, useEffect } from "react";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
-
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 import {
   collection,
   addDoc,
   getDocs,
   getDoc,
   doc,
-  deleteDoc
+  deleteDoc,
+  updateDoc
 } from "firebase/firestore";
 import { db } from "./firebase";
 import { async } from "@firebase/util";
@@ -22,8 +34,34 @@ function TodoItem({ todo, key }) {
 export default function Todos() {
   const [todo, setTodo] = useState("");
   const [todos, setTodos] = useState([]);
-  const [editingTodo, setEditingTodo] = useState(false);
-  const [curEdiditingID, setCurEditingID] = useState(-1);
+  const [open, setOpen] = useState(false);
+  const [curEditTodo, setCurEditTodo] = useState({});
+  const [editedTodo, setEditedTodo] = useState("");
+
+  const handleClickOpen = (todo) => {
+    setOpen(true);
+    setCurEditTodo(todo);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+
+    if (curEditTodo !== {}) {
+      updateTodo();
+    } else {
+      alert(`curEditTodo is empty!`);
+    }
+  };
+
+  const updateTodo = async () => {
+    const newTodo = { ...curEditTodo, todo: editedTodo };
+
+    try {
+      await updateDoc(doc(db, "todos", curEditTodo.id), newTodo);
+    } catch (e) {
+      alert(e);
+    }
+  };
 
   const fetchPost = async () => {
     await getDocs(collection(db, "todos")).then((querySnapshot) => {
@@ -110,10 +148,7 @@ export default function Todos() {
                   />
                   <ModeEditIcon
                     className="pointer"
-                    onClick={(e) => {
-                      setCurEditingID(todo.id);
-                      setEditingTodo(!editingTodo);
-                    }}
+                    onClick={(e) => handleClickOpen(todo)}
                     color="error"
                   />
                 </Box>
@@ -121,6 +156,30 @@ export default function Todos() {
             </Paper>
           ))}
         </Box>
+
+        <Dialog open={open} onClose={handleClose}>
+          <DialogTitle>Edit todo</DialogTitle>
+          <DialogContent>
+            <DialogContentText></DialogContentText>
+            <TextField
+              autoFocus
+              margin="dense"
+              id="name"
+              label="Edit todo"
+              type="text"
+              fullWidth
+              variant="standard"
+              value={editedTodo}
+              onChange={(e) => {
+                setEditedTodo(e.target.value);
+              }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>Cancel</Button>
+            <Button onClick={handleClose}>SAVE</Button>
+          </DialogActions>
+        </Dialog>
       </div>
     </section>
   );
