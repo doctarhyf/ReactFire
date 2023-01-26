@@ -9,6 +9,10 @@
   align-items: center;
 }
 
+.del {
+  cursor: pointer;
+}
+
 .todo {
   width: 70%;
   margin: 3rem auto 0 auto;

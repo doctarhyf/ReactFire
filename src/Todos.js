@@ -1,9 +1,18 @@
-import { Container, Box, Typography } from "@mui/material";
+import { Container, Box, Typography, Paper } from "@mui/material";
 import { useState, useEffect } from "react";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  getDoc,
+  doc,
+  deleteDoc
+} from "firebase/firestore";
 import { db } from "./firebase";
 import { async } from "@firebase/util";
+import "./styles.css";
 
 export default function Todos() {
   const [todo, setTodo] = useState("");
@@ -40,6 +49,16 @@ export default function Todos() {
     }
   };
 
+  const onDeleteTodo = async (todo) => {
+    alert(`${JSON.stringify(todo)}`);
+
+    try {
+      await deleteDoc(doc(db, "todos", todo.id));
+    } catch (e) {
+      alert(e);
+    }
+  };
+
   return (
     <section className="todo-container">
       <div className="todo">
@@ -61,11 +80,29 @@ export default function Todos() {
           </div>
         </div>
 
-        <div className="todo-content">
+        <Box
+          sx={{ display: "flex", gap: 2, flexDirection: "column" }}
+          className="todo-content"
+        >
           {todos?.map((todo, i) => (
-            <p key={i}>{todo.todo}</p>
+            <Paper elevation={3} sx={{ p: 2 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between"
+                }}
+              >
+                <p key={i}>{todo.todo}</p>{" "}
+                <HighlightOffIcon
+                  className="del"
+                  onClick={(e) => onDeleteTodo(todo)}
+                  color="error"
+                />
+              </Box>
+            </Paper>
           ))}
-        </div>
+        </Box>
       </div>
     </section>
   );
