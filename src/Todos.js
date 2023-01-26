@@ -32,7 +32,7 @@ export default function Todos() {
 
   useEffect(() => {
     fetchPost();
-  }, []);
+  }, [todos]);
 
   const addTodo = async (e) => {
     e.preventDefault();
@@ -43,7 +43,7 @@ export default function Todos() {
       const docRef = await addDoc(collection(db, "todos"), {
         todo: todo
       });
-      alert("Document written with ID: ", docRef.id);
+      //alert("Document written with ID: ", docRef.id);
     } catch (e) {
       alert(`error adding document ${e}`);
     }
@@ -62,7 +62,7 @@ export default function Todos() {
   return (
     <section className="todo-container">
       <div className="todo">
-        <h1 className="header">Todo-App</h1>
+        <h1 className="header">Todo-App ({todos.length})</h1>
 
         <div>
           <div>
