@@ -1,6 +1,7 @@
 import { Container, Box, Typography, Paper } from "@mui/material";
 import { useState, useEffect } from "react";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
+import ModeEditIcon from "@mui/icons-material/ModeEdit";
 
 import {
   collection,
@@ -14,9 +15,15 @@ import { db } from "./firebase";
 import { async } from "@firebase/util";
 import "./styles.css";
 
+function TodoItem({ todo, key }) {
+  return <p key={key}> {todo.todo}</p>;
+}
+
 export default function Todos() {
   const [todo, setTodo] = useState("");
   const [todos, setTodos] = useState([]);
+  const [editingTodo, setEditingTodo] = useState(false);
+  const [curEdiditingID, setCurEditingID] = useState(-1);
 
   const fetchPost = async () => {
     await getDocs(collection(db, "todos")).then((querySnapshot) => {
@@ -90,15 +97,26 @@ export default function Todos() {
                 sx={{
                   display: "flex",
                   flexDirection: "row",
-                  justifyContent: "space-between"
+                  justifyContent: "space-between",
+                  alignItems: "center"
                 }}
               >
-                <p key={i}>{todo.todo}</p>{" "}
-                <HighlightOffIcon
-                  className="del"
-                  onClick={(e) => onDeleteTodo(todo)}
-                  color="error"
-                />
+                <TodoItem key={i} todo={todo} />{" "}
+                <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
+                  <HighlightOffIcon
+                    className="pointer"
+                    onClick={(e) => onDeleteTodo(todo)}
+                    color="success"
+                  />
+                  <ModeEditIcon
+                    className="pointer"
+                    onClick={(e) => {
+                      setCurEditingID(todo.id);
+                      setEditingTodo(!editingTodo);
+                    }}
+                    color="error"
+                  />
+                </Box>
               </Box>
             </Paper>
           ))}

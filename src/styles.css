@@ -9,8 +9,13 @@
   align-items: center;
 }
 
-.del {
+.pointer {
   cursor: pointer;
+}
+
+.hide {
+  display: none;
+  background-color: red;
 }
 
 .todo {
